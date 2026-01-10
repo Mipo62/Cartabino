@@ -4,10 +4,11 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Cartabino, Rappelino !</title>
+    
     <link rel="manifest" href="manifest.json">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <link rel="apple-touch-icon" href="poster.png">
+    <link rel="apple-touch-icon" href="icon.png">
     
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;800&display=swap" rel="stylesheet">
     <style>
@@ -224,10 +225,14 @@
             const tomorrow = new Date(now);
             tomorrow.setDate(now.getDate() + 1);
             
-            // Format de la date de demain
+            // FIX DATE ISO LOCALE (Correction bug minuit)
+            const yyyy = tomorrow.getFullYear();
+            const mm = String(tomorrow.getMonth() + 1).padStart(2, '0');
+            const dd = String(tomorrow.getDate()).padStart(2, '0');
+            const tISO = `${yyyy}-${mm}-${dd}`;
+            
             const options = { weekday: 'long', day: 'numeric', month: 'long' };
             const tDateString = tomorrow.toLocaleDateString('fr-FR', options);
-            const tISO = tomorrow.toISOString().split('T')[0];
             const tDayName = ["Dimanche", "Lundi", "Mardi", "Mercredi", "Jeudi", "Vendredi", "Samedi"][tomorrow.getDay()];
 
             document.getElementById('tomorrow-title').innerText = tDateString;
