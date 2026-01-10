@@ -1,0 +1,456 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cartabino, Rappelino !</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #6366f1;
+            --primary-light: #818cf8;
+            --secondary: #f43f5e;
+            --accent: #10b981;
+            --bg: #f8fafc;
+            --card-bg: #ffffff;
+            --text-main: #1e293b;
+            --text-sub: #64748b;
+            --shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.1);
+        }
+
+        * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+
+        body {
+            font-family: 'Poppins', sans-serif;
+            background-color: var(--bg);
+            color: var(--text-main);
+            margin: 0;
+            padding: 0;
+            line-height: 1.6;
+        }
+
+        /* --- NAVIGATION --- */
+        nav {
+            background: rgba(255, 255, 255, 0.8);
+            backdrop-filter: blur(10px);
+            padding: 15px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+        }
+
+        .nav-icons { display: flex; gap: 15px; }
+        .icon-btn {
+            font-size: 1.4rem;
+            cursor: pointer;
+            transition: transform 0.2s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .icon-btn:hover { transform: scale(1.1); }
+
+        .logo {
+            font-weight: 700;
+            font-size: 1.1rem;
+            background: linear-gradient(to right, var(--primary), var(--secondary));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        /* --- CONTENU PRINCIPAL --- */
+        .container {
+            max-width: 500px;
+            margin: 20px auto;
+            padding: 0 20px;
+        }
+
+        .main-card {
+            background: var(--card-bg);
+            border-radius: 24px;
+            padding: 25px;
+            box-shadow: var(--shadow);
+            border: 1px solid rgba(255,255,255,0.5);
+        }
+
+        .tomorrow-header {
+            text-align: center;
+            margin-bottom: 25px;
+        }
+
+        .tomorrow-header h1 {
+            margin: 0;
+            font-size: 1.8rem;
+            color: var(--primary);
+        }
+
+        .tomorrow-header p {
+            margin: 5px 0;
+            color: var(--text-sub);
+            font-weight: 400;
+        }
+
+        /* --- LISTE DES COURS --- */
+        .course-card {
+            background: #f1f5f9;
+            border-radius: 16px;
+            padding: 15px;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            transition: 0.3s;
+        }
+
+        .time-box {
+            min-width: 70px;
+            text-align: center;
+            font-size: 0.75rem;
+            font-weight: 700;
+            color: var(--primary);
+            border-right: 2px solid #e2e8f0;
+            padding-right: 10px;
+        }
+
+        .course-info { flex-grow: 1; }
+        .course-info h3 { margin: 0; font-size: 1rem; text-transform: uppercase; }
+        
+        .material-list {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 5px;
+            margin-top: 5px;
+        }
+
+        .tag {
+            background: white;
+            color: var(--text-sub);
+            padding: 2px 10px;
+            border-radius: 20px;
+            font-size: 0.7rem;
+            border: 1px solid #e2e8f0;
+        }
+
+        /* --- RAPPELS --- */
+        .reminder-alert {
+            background: linear-gradient(135deg, #fff9c4 0%, #fff176 100%);
+            padding: 15px;
+            border-radius: 16px;
+            margin-bottom: 20px;
+            border-left: 5px solid #fbc02d;
+            font-size: 0.9rem;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        /* --- OVERLAYS --- */
+        .overlay {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: var(--bg);
+            z-index: 200;
+            display: none;
+            overflow-y: auto;
+            padding: 20px;
+            animation: slideUp 0.3s ease-out;
+        }
+
+        @keyframes slideUp {
+            from { transform: translateY(100%); }
+            to { transform: translateY(0); }
+        }
+
+        .overlay-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+        }
+
+        /* --- FORMULAIRES --- */
+        .form-group {
+            background: white;
+            padding: 20px;
+            border-radius: 16px;
+            margin-bottom: 15px;
+            box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05);
+        }
+
+        label { display: block; font-size: 0.8rem; font-weight: 600; margin-bottom: 5px; color: var(--text-sub); }
+        input, select {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #e2e8f0;
+            border-radius: 10px;
+            font-family: inherit;
+            margin-bottom: 10px;
+        }
+
+        .btn {
+            border: none;
+            padding: 12px 20px;
+            border-radius: 12px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: 0.2s;
+        }
+
+        .btn-primary { background: var(--primary); color: white; width: 100%; }
+        .btn-add { background: var(--accent); color: white; padding: 5px 15px; border-radius: 8px; }
+        .btn-close { background: #e2e8f0; color: var(--text-main); }
+
+        /* --- GRILLE SEMAINE --- */
+        .week-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+            gap: 15px;
+        }
+        .week-day {
+            background: white;
+            padding: 15px;
+            border-radius: 16px;
+            min-height: 200px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+        }
+        .week-day h4 { 
+            margin: 0 0 10px 0; 
+            text-align: center; 
+            color: var(--primary);
+            border-bottom: 1px solid #f1f5f9;
+        }
+        .week-course { font-size: 0.7rem; border-left: 2px solid var(--primary); padding-left: 5px; margin-bottom: 5px; }
+
+    </style>
+</head>
+<body>
+
+    <nav>
+        <div class="nav-icons">
+            <span class="icon-btn" onclick="openOverlay('week')">📅</span>
+            <span class="icon-btn" onclick="openOverlay('reminders')">🔔</span>
+        </div>
+        <div class="logo">Cartabino, Rappelino !</div>
+        <div class="icon-btn" onclick="openOverlay('settings')">⚙️</div>
+    </nav>
+
+    <div class="container">
+        <div id="reminder-display"></div>
+
+        <div class="main-card">
+            <div class="tomorrow-header">
+                <p id="current-day-label">Préparation du sac</p>
+                <h1 id="tomorrow-name">Demain</h1>
+            </div>
+
+            <div id="main-list">
+                </div>
+        </div>
+    </div>
+
+    <div id="overlay-week" class="overlay">
+        <div class="overlay-header">
+            <h2>Mon Planning</h2>
+            <button class="btn btn-close" onclick="closeOverlay('week')">Fermer</button>
+        </div>
+        <div class="week-grid" id="week-grid-content"></div>
+    </div>
+
+    <div id="overlay-reminders" class="overlay">
+        <div class="overlay-header">
+            <h2>Rappels Ponctuels</h2>
+            <button class="btn btn-close" onclick="closeOverlay('reminders')">Fermer</button>
+        </div>
+        <div class="form-group">
+            <label>Prendre quoi ?</label>
+            <input type="text" id="rem-text" placeholder="Ex: Autorisation sortie">
+            <label>Pour quand ? (Le jour où tu en as besoin)</label>
+            <input type="date" id="rem-date">
+            <button class="btn btn-primary" onclick="saveReminder()">Ajouter le rappel</button>
+        </div>
+        <div id="reminder-list-config"></div>
+    </div>
+
+    <div id="overlay-settings" class="overlay">
+        <div class="overlay-header">
+            <h2>Configuration</h2>
+            <button class="btn btn-close" onclick="closeOverlay('settings')">Fermer</button>
+        </div>
+
+        <div class="form-group">
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:15px">
+                <h3 style="margin:0">Mes Matières</h3>
+                <button class="btn btn-add" onclick="addSubject()">+</button>
+            </div>
+            <div id="settings-subjects"></div>
+        </div>
+
+        <div class="form-group">
+            <h3>Emploi du Temps</h3>
+            <div id="settings-schedule"></div>
+        </div>
+    </div>
+
+    <script>
+        // Initialisation de la base de données
+        let db = JSON.parse(localStorage.getItem('cartabino_v2')) || {
+            subjects: [
+                { name: "MATH", tools: "Cahier jaune, équerre" },
+                { name: "FRANCAIS", tools: "Grand cahier rouge" }
+            ],
+            schedule: {
+                "Lundi": { active: true, courses: [] },
+                "Mardi": { active: true, courses: [] },
+                "Mercredi": { active: true, courses: [] },
+                "Jeudi": { active: true, courses: [] },
+                "Vendredi": { active: true, courses: [] },
+                "Samedi": { active: false, courses: [] }
+            },
+            reminders: []
+        };
+
+        const daysArr = ["Lundi", "Mardi", "Mercredi", "Jeudi", "Vendredi", "Samedi"];
+
+        function save() {
+            localStorage.setItem('cartabino_v2', JSON.stringify(db));
+            refreshUI();
+        }
+
+        // --- GESTION DES OVERLAYS ---
+        function openOverlay(id) { document.getElementById('overlay-' + id).style.display = 'block'; }
+        function closeOverlay(id) { document.getElementById('overlay-' + id).style.display = 'none'; }
+
+        // --- GESTION MATIERES ---
+        function addSubject() {
+            db.subjects.push({ name: "NOUVELLE", tools: "" });
+            save();
+        }
+
+        function updateSub(idx, field, val) {
+            db.subjects[idx][field] = val.toUpperCase();
+            save();
+        }
+
+        // --- GESTION PLANNING ---
+        function addCourse(day) {
+            db.schedule[day].courses.push({ start: "08:00", end: "09:00", name: "" });
+            save();
+        }
+
+        // --- LOGIQUE RAPPEL ---
+        function saveReminder() {
+            const text = document.getElementById('rem-text').value;
+            const date = document.getElementById('rem-date').value;
+            if(text && date) {
+                db.reminders.push({ text, date });
+                document.getElementById('rem-text').value = "";
+                save();
+            }
+        }
+
+        // --- MISE À JOUR INTERFACE ---
+        function refreshUI() {
+            const now = new Date();
+            const tomorrow = new Date(now);
+            tomorrow.setDate(now.getDate() + 1);
+            const tomorrowName = ["Dimanche", "Lundi", "Mardi", "Mercredi", "Jeudi", "Vendredi", "Samedi"][tomorrow.getDay()];
+            const tomorrowISO = tomorrow.toISOString().split('T')[0];
+
+            // 1. Accueil : Rappels
+            const remDisplay = document.getElementById('reminder-display');
+            remDisplay.innerHTML = "";
+            db.reminders.filter(r => r.date === tomorrowISO).forEach(r => {
+                remDisplay.innerHTML += `<div class="reminder-alert">🔔 <strong>À prendre :</strong> ${r.text}</div>`;
+            });
+
+            // 2. Accueil : Matières
+            document.getElementById('tomorrow-name').innerText = tomorrowName;
+            const mainList = document.getElementById('main-list');
+            mainList.innerHTML = "";
+            
+            const dayData = db.schedule[tomorrowName];
+            if (dayData && dayData.active && dayData.courses.length > 0) {
+                dayData.courses.sort((a,b) => a.start.localeCompare(b.start)).forEach(c => {
+                    const sub = db.subjects.find(s => s.name === c.name);
+                    const tags = sub ? sub.tools.split(',').map(t => `<span class="tag">${t.trim()}</span>`).join('') : '';
+                    mainList.innerHTML += `
+                        <div class="course-card">
+                            <div class="time-box">${c.start}<br>${c.end}</div>
+                            <div class="course-info">
+                                <h3>${c.name || 'Matière ?'}</h3>
+                                <div class="material-list">${tags}</div>
+                            </div>
+                        </div>
+                    `;
+                });
+            } else {
+                mainList.innerHTML = "<p style='text-align:center; color:gray;'>Pas de cours demain ! 🏖️</p>";
+            }
+
+            // 3. Configuration Matières
+            const subSettings = document.getElementById('settings-subjects');
+            subSettings.innerHTML = db.subjects.map((s, i) => `
+                <div style="display:flex; gap:5px; margin-bottom:10px">
+                    <input type="text" value="${s.name}" onchange="updateSub(${i}, 'name', this.value)" style="flex:1">
+                    <input type="text" value="${s.tools}" onchange="updateSub(${i}, 'tools', this.value)" style="flex:2" placeholder="Matériel...">
+                    <button class="btn" onclick="db.subjects.splice(${i},1); save()">🗑️</button>
+                </div>
+            `).join('');
+
+            // 4. Configuration Planning
+            const schSettings = document.getElementById('settings-schedule');
+            schSettings.innerHTML = "";
+            daysArr.forEach(day => {
+                const dayObj = db.schedule[day];
+                let coursesHtml = dayObj.courses.map((c, i) => `
+                    <div style="display:flex; gap:5px; margin-bottom:5px">
+                        <input type="time" value="${c.start}" onchange="db.schedule['${day}'].courses[${i}].start=this.value; save()" style="width:80px">
+                        <input type="time" value="${c.end}" onchange="db.schedule['${day}'].courses[${i}].end=this.value; save()" style="width:80px">
+                        <select onchange="db.schedule['${day}'].courses[${i}].name=this.value; save()" style="flex:1">
+                            <option value="">--</option>
+                            ${db.subjects.map(s => `<option value="${s.name}" ${s.name==c.name?'selected':''}>${s.name}</option>`).join('')}
+                        </select>
+                        <button onclick="db.schedule['${day}'].courses.splice(${i},1); save()">x</button>
+                    </div>
+                `).join('');
+                
+                schSettings.innerHTML += `
+                    <div style="border-bottom:1px solid #eee; padding:10px 0">
+                        <div style="display:flex; justify-content:space-between">
+                            <label><input type="checkbox" ${dayObj.active?'checked':''} onchange="db.schedule['${day}'].active=this.checked; save()"> ${day}</label>
+                            <button class="btn btn-add" onclick="addCourse('${day}')">+</button>
+                        </div>
+                        ${coursesHtml}
+                    </div>
+                `;
+            });
+
+            // 5. Vue Semaine
+            const weekGrid = document.getElementById('week-grid-content');
+            weekGrid.innerHTML = daysArr.map(day => {
+                const courses = db.schedule[day].active ? db.schedule[day].courses.sort((a,b)=>a.start.localeCompare(b.start)) : [];
+                return `
+                    <div class="week-day">
+                        <h4>${day}</h4>
+                        ${courses.map(c => `<div class="week-course"><strong>${c.start}</strong> ${c.name}</div>`).join('')}
+                    </div>
+                `;
+            }).join('');
+
+            // 6. Liste Rappels Config
+            document.getElementById('reminder-list-config').innerHTML = db.reminders.map((r, i) => `
+                <div class="course-card" style="margin-top:10px">
+                    <div class="course-info"><strong>${r.date}</strong> : ${r.text}</div>
+                    <button class="btn" onclick="db.reminders.splice(${i},1); save()">🗑️</button>
+                </div>
+            `).join('');
+        }
+
+        refreshUI();
+    </script>
+</body>
+</html>
