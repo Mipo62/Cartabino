@@ -2,7 +2,7 @@ const CACHE_NAME = 'cartabino-v1';
 const ASSETS = [
   'index.html',
   'poster.png',
-  'icon-192.png',
+  'icon512.png',
   'manifest.json'
 ];
 
