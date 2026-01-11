@@ -28,7 +28,7 @@
         /* SPLASH SCREEN */
         #splash-screen {
             position: fixed; inset: 0; z-index: 9999;
-            background: url('poster.png') no-repeat center center;
+            background: url('poster1.png') no-repeat center center;
             background-size: cover; background-color: #000;
             transition: opacity 0.8s ease, visibility 0.8s;
         }
@@ -165,13 +165,22 @@
         const storageKey = 'cartabino_final_v6';
 
         function initDB() {
-            let data = localStorage.getItem(storageKey);
-            if (data) {
-                db = JSON.parse(data);
-                if (!db.schedule["Lundi"].slots) resetDB();
-            } else {
-                resetDB();
+        let data = localStorage.getItem(storageKey);
+        if (data) {
+        db = JSON.parse(data);
+        
+        // --- FORCE LA MISE À JOUR À 11 CRÉNEAUX ---
+        Object.keys(db.schedule).forEach(day => {
+            // Si le nombre de créneaux enregistrés est plus petit que DEFAULT_SLOTS
+            while(db.schedule[day].slots.length < DEFAULT_SLOTS.length) {
+                db.schedule[day].slots.push(""); // On ajoute une case vide à la fin
             }
+        });
+        // On enregistre la nouvelle structure
+        localStorage.setItem(storageKey, JSON.stringify(db));
+        } else {
+        resetDB();
+        }
         }
 
         function resetDB() {
@@ -292,4 +301,5 @@
     </script>
 </body>
 </html>
+
 
