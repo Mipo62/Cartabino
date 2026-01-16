@@ -4,12 +4,6 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
     <title>Cartabino !</title>
-    
-    <link rel="manifest" href="manifest.json">
-    <meta name="apple-mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <link rel="apple-touch-icon" href="icon.png">
-    
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;800&display=swap" rel="stylesheet">
     <style>
         :root {
@@ -17,290 +11,241 @@
             --bg: #f8fafc; --card: rgba(255, 255, 255, 0.95);
             --text: #1e293b; --border: #e2e8f0;
         }
-
         * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+        body { font-family: 'Outfit', sans-serif; background-color: var(--bg); color: var(--text); margin: 0; padding: 0; }
 
-        body {
-            font-family: 'Outfit', sans-serif; background-color: var(--bg); color: var(--text);
-            margin: 0; padding: 0; overflow-x: hidden; min-height: 100vh;
-        }
-
-        /* SPLASH SCREEN */
-        #splash-screen {
-            position: fixed; inset: 0; z-index: 9999;
-            background: url('poster1.png') no-repeat center center;
-            background-size: cover; background-color: #000;
-            transition: opacity 0.8s ease, visibility 0.8s;
-        }
-        #splash-screen.hidden { opacity: 0; visibility: hidden; }
-
-        /* NAV BAR */
         nav {
             background: rgba(255, 255, 255, 0.8); backdrop-filter: blur(10px);
-            padding: 15px 20px; padding-top: calc(15px + env(safe-area-inset-top));
-            display: flex; justify-content: space-between; align-items: center;
+            padding: 15px 20px; display: flex; justify-content: space-between; align-items: center;
             position: sticky; top: 0; z-index: 100; border-bottom: 1px solid var(--border);
         }
         .logo { font-weight: 800; font-size: 1.2rem; background: linear-gradient(45deg, var(--primary), var(--secondary)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
-        .nav-icons { display: flex; gap: 20px; }
-        .icon-btn { font-size: 1.5rem; cursor: pointer; transition: transform 0.2s; }
-        .icon-btn:active { transform: scale(1.2); }
+        
+        .container { max-width: 500px; margin: 20px auto; padding: 0 20px 40px 20px; }
+        @media (orientation: landscape) { .container { max-width: 950px; } }
 
-        /* CONTENEUR PRINCIPAL */
-        .container { max-width: 500px; margin: 20px auto; padding: 0 20px 40px 20px; transition: max-width 0.3s; }
-        @media (orientation: landscape) and (min-width: 768px) { .container { max-width: 850px; } }
-
-        /* CARTES ET LISTES */
-        .main-card {
-            background: var(--card); border-radius: 28px; padding: 30px;
-            box-shadow: 0 20px 25px -5px rgba(0,0,0,0.1); text-align: center; border: 1px solid white;
-        }
-        .tomorrow-tag { color: var(--secondary); font-weight: 600; text-transform: uppercase; letter-spacing: 2px; font-size: 0.75rem; }
-        h1 { margin: 5px 0; font-size: 1.8rem; text-transform: capitalize; }
-        .tagline { font-size: 0.9rem; color: #64748b; margin-bottom: 25px; font-weight: 600; }
-
-        .course-item {
-            display: flex; align-items: center; gap: 15px; background: #fff;
-            padding: 15px; border-radius: 20px; margin-bottom: 12px; text-align: left;
-            box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05);
-        }
-        .time-col { min-width: 95px; font-weight: 700; color: var(--primary); border-right: 2px solid var(--bg); font-size: 0.8rem; }
-        .tag { background: var(--bg); padding: 2px 8px; border-radius: 6px; font-size: 0.75rem; color: #475569; border: 1px solid var(--border); margin-right: 4px; }
-
+        /* STYLE ALARME / RAPPEL JAUNE */
         .reminder-main {
             background: linear-gradient(135deg, #fff9c4 0%, #ffecb3 100%);
-            border: 1px solid #ffe082; padding: 18px; border-radius: 24px;
-            margin-bottom: 20px; color: #856404; animation: bounceIn 0.5s ease;
-            box-shadow: 0 10px 15px -3px rgba(0,0,0,0.1); text-align: left;
+            border: 1px solid #ffe082; padding: 18px; border-radius: 20px;
+            margin-bottom: 20px; color: #856404; box-shadow: 0 10px 15px -3px rgba(0,0,0,0.1);
+            animation: bounceIn 0.5s ease; text-align: left;
         }
         @keyframes bounceIn { from { transform: scale(0.9); opacity: 0; } to { transform: scale(1); opacity: 1; } }
 
-        /* OVERLAYS */
-        .overlay {
-            position: fixed; inset: 0; background: var(--bg); z-index: 200;
-            display: none; overflow-y: auto; padding: 20px;
-            padding-top: calc(20px + env(safe-area-inset-top));
-        }
-        .config-section { background: white; padding: 20px; border-radius: 24px; margin-bottom: 20px; border: 1px solid var(--border); }
-        label { display: block; margin-bottom: 5px; font-weight: 600; font-size: 0.9rem; color: var(--text); }
-        input, select { width: 100%; padding: 12px; border: 1px solid var(--border); border-radius: 12px; font-family: inherit; font-size: 1rem; margin-bottom: 10px; }
-        
-        .btn { border: none; padding: 12px 20px; border-radius: 14px; font-weight: 600; cursor: pointer; }
-        .btn-action { background: var(--primary); color: white; width: 100%; margin-top: 10px; }
+        .main-card { background: var(--card); border-radius: 28px; padding: 30px; box-shadow: 0 20px 25px -5px rgba(0,0,0,0.1); text-align: center; }
+        .week-badge { font-size: 0.7rem; background: #e0e7ff; color: var(--primary); padding: 4px 12px; border-radius: 12px; font-weight: 700; margin-bottom: 10px; display: inline-block; }
 
-        /* PLANNING SEMAINE */
-        .week-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 10px; }
-        .week-card { background: white; padding: 12px; border-radius: 18px; border: 1px solid var(--border); }
-        .week-card h4 { margin: 0 0 10px 0; color: var(--secondary); text-align: center; border-bottom: 1px solid #f1f5f9; }
-        .slot-mini { font-size: 0.7rem; padding: 4px 0; border-bottom: 1px dashed #eee; display: flex; justify-content: space-between; }
+        .course-item { display: flex; align-items: center; gap: 15px; background: #fff; padding: 15px; border-radius: 20px; margin-bottom: 12px; text-align: left; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05); }
+        .time-col { min-width: 85px; font-weight: 700; color: var(--primary); font-size: 0.8rem; border-right: 2px solid var(--bg); }
+        .tag { background: var(--bg); padding: 2px 8px; border-radius: 6px; font-size: 0.7rem; color: #475569; border: 1px solid var(--border); margin-right: 4px; display: inline-block; margin-top: 4px; }
+
+        .overlay { position: fixed; inset: 0; background: var(--bg); z-index: 200; display: none; overflow-y: auto; padding: 20px; }
+        .config-section { background: white; padding: 20px; border-radius: 24px; margin-bottom: 20px; border: 1px solid var(--border); }
+
+        /* GRILLE DE SAISIE */
+        .sch-scroll { overflow-x: auto; display: flex; gap: 10px; padding-bottom: 10px; }
+        .sch-times-sidebar { width: 70px; flex-shrink: 0; padding-top: 45px; }
+        .sch-day-column { min-width: 170px; flex: 1; background: white; border-radius: 15px; padding: 10px; border: 1px solid var(--border); }
+        .slot-box { height: 105px; display: flex; flex-direction: column; gap: 4px; border-bottom: 1px solid #f8fafc; padding: 8px 0; }
+        
+        select { font-size: 0.8rem; padding: 5px; border-radius: 8px; border: 1px solid #ddd; width: 100%; background: #fff; }
+        .btn { border: none; padding: 10px 15px; border-radius: 12px; font-weight: 600; cursor: pointer; }
+        .btn-plus { background: var(--primary); color: white; border: none; border-radius: 5px; font-size: 0.65rem; padding: 3px 8px; cursor: pointer; align-self: flex-start; }
+        .btn-del-sb { background: #fee2e2; color: #ef4444; border: none; border-radius: 5px; font-size: 0.6rem; padding: 2px 5px; cursor: pointer; }
+        .tag-sb { font-size: 0.55rem; font-weight: 800; color: var(--secondary); text-transform: uppercase; }
+
+        .week-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 10px; }
+        .week-card { background: white; padding: 12px; border-radius: 15px; border: 1px solid var(--border); }
+        .slot-mini { font-size: 0.7rem; border-bottom: 1px dashed #eee; padding: 3px 0; display: flex; justify-content: space-between; }
     </style>
 </head>
 <body>
 
-    <div id="splash-screen"></div>
-
     <nav>
-        <div class="nav-icons">
-            <span class="icon-btn" onclick="openOverlay('week')">📅</span>
-            <span class="icon-btn" onclick="openOverlay('reminders')">🔔</span>
+        <div style="display:flex; gap:15px">
+            <span style="cursor:pointer; font-size:1.5rem" onclick="openOverlay('week')">📅</span>
+            <span style="cursor:pointer; font-size:1.5rem" onclick="openOverlay('reminders')">🔔</span>
         </div>
         <div class="logo">Cartabino !</div>
-        <div class="icon-btn" onclick="openOverlay('settings')">⚙️</div>
+        <span style="cursor:pointer; font-size:1.5rem" onclick="openOverlay('settings')">⚙️</span>
     </nav>
 
     <div class="container">
         <div id="active-reminders"></div>
         <div class="main-card">
-            <div class="tomorrow-tag">🎒 Dans mon sac pour</div>
-            <h1 id="tomorrow-title">Chargement...</h1>
-            <div class="tagline">ZÉRO OUBLINO, FRÈRE.</div>
+            <div id="week-indicator" class="week-badge"></div>
+            <h1 id="tomorrow-title" style="font-size:1.4rem; margin:10px 0; text-transform: capitalize;"></h1>
             <div id="main-list"></div>
         </div>
     </div>
 
     <div id="over-week" class="overlay">
-        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px">
+        <div style="display:flex; justify-content:space-between; margin-bottom:20px; align-items: center;">
             <h2>Mon Planning</h2><button class="btn" onclick="closeOverlay('week')">Fermer</button>
         </div>
+        <div id="plan-week-info" style="background:var(--primary); color:white; padding:12px; border-radius:12px; text-align:center; font-weight:700; margin-bottom:15px"></div>
         <div id="week-display" class="week-grid"></div>
     </div>
 
     <div id="over-reminders" class="overlay">
-        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px">
-            <h2>🔔 Rappels Spéciaux</h2><button class="btn" onclick="closeOverlay('reminders')">Fermer</button>
+        <div style="display:flex; justify-content:space-between; margin-bottom:20px; align-items: center;">
+            <h2>🔔 Rappels</h2><button class="btn" onclick="closeOverlay('reminders')">Fermer</button>
         </div>
         <div class="config-section">
-            <label>🤔 Prendre quoi ?</label>
-            <input type="text" id="rem-text" placeholder="Ex: Autorisation sortie, Piscine...">
-            <label>📅 Pour quel jour ?</label>
-            <input type="date" id="rem-date">
-            <button class="btn btn-action" onclick="addReminder()">Ajouter le rappel</button>
+            <input type="text" id="rem-text" placeholder="Ex: Prendre le sac de sport" style="width:100%; padding:10px; border-radius:10px; border:1px solid #ddd; margin-bottom:10px">
+            <input type="date" id="rem-date" style="width:100%; padding:10px; border-radius:10px; border:1px solid #ddd; margin-bottom:10px">
+            <button class="btn" onclick="addReminder()" style="width:100%; background:var(--primary); color:white">Ajouter</button>
         </div>
-        <div id="rem-config-list"></div>
+        <div id="rem-list-config"></div>
     </div>
 
     <div id="over-settings" class="overlay">
-        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px">
-            <h2>Paramètres</h2><button class="btn" onclick="closeOverlay('settings')">Fermer</button>
+        <div style="display:flex; justify-content:space-between; margin-bottom:20px; align-items: center;">
+            <h2>Réglages</h2><button class="btn" onclick="closeOverlay('settings')">Fermer</button>
         </div>
+        
         <div class="config-section">
-            <h3>Mes Matières</h3>
-            <div id="sub-config-list"></div>
-            <button class="btn" style="background:#e0e7ff; color:var(--primary); width:100%" onclick="addSubject()">+ Ajouter une matière</button>
+            <h3>Matières & Matériel</h3>
+            <div id="sub-list"></div>
+            <button class="btn" onclick="addSubject()" style="width:100%; margin-top:10px; background:#e0e7ff; color:var(--primary)">+ Ajouter une matière</button>
         </div>
+
         <div class="config-section">
             <h3>Emploi du Temps</h3>
-            <div id="sch-config-list"></div>
+            <p style="font-size:0.75rem; color:gray; margin-bottom:15px">Glisse vers la droite →. Pour supprimer une semaine B, clique sur la poubelle rouge.</p>
+            <div class="sch-scroll" id="sch-grid"></div>
         </div>
     </div>
 
     <script>
-        const DEFAULT_SLOTS = [
-            "08h00 - 08h40", "08h45 - 09h25", "09h30 - 10h10", "10h15 - 11h","11h15 - 11h45",
-            "12h00 - 12h30", "12h45 - 13h30", "13h30 - 14h15", "14h15 - 15h00",
-            "15h00 - 15h45","15h45 - 16h30", "16h30 - 17h30"
-        ];
-
-        let db;
+        const SLOTS = ["08:00", "08:45", "09:30", "10:15", "11:15", "12:00", "12:45", "13:30", "14:15", "15:00", "15:45", "16:30", "17:30"];
         const storageKey = 'cartabino_final_v6';
 
-        function initDB() {
-        let data = localStorage.getItem(storageKey);
-        if (data) {
-        db = JSON.parse(data);
-        
-        // --- FORCE LA MISE À JOUR À 11 CRÉNEAUX ---
-        Object.keys(db.schedule).forEach(day => {
-            // Si le nombre de créneaux enregistrés est plus petit que DEFAULT_SLOTS
-            while(db.schedule[day].slots.length < DEFAULT_SLOTS.length) {
-                db.schedule[day].slots.push(""); // On ajoute une case vide à la fin
-            }
-        });
-        // On enregistre la nouvelle structure
-        localStorage.setItem(storageKey, JSON.stringify(db));
-        } else {
-        resetDB();
-        }
-        }
+        let db = JSON.parse(localStorage.getItem(storageKey)) || {
+            subjects: [{name:"MATHS", tools:"Cahier"}],
+            schedule: { "Lundi":{active:true,slots:[]}, "Mardi":{active:true,slots:[]}, "Mercredi":{active:true,slots:[]}, "Jeudi":{active:true,slots:[]}, "Vendredi":{active:true,slots:[]}, "Samedi":{active:false,slots:[]} },
+            reminders: []
+        };
 
-        function resetDB() {
-            db = {
-                subjects: [{name: "MATHS", tools: "Règle, équerre"}],
-                schedule: {
-                    "Lundi": {active:true, slots: Array(10).fill("")},
-                    "Mardi": {active:true, slots: Array(10).fill("")},
-                    "Mercredi": {active:true, slots: Array(10).fill("")},
-                    "Jeudi": {active:true, slots: Array(10).fill("")},
-                    "Vendredi": {active:true, slots: Array(10).fill("")},
-                    "Samedi": {active:false, slots: Array(10).fill("")}
-                },
-                reminders: []
-            };
-            save();
+        function getWeek(d = new Date()) {
+            const date = new Date(d.getTime());
+            date.setDate(date.getDate() + 3 - (date.getDay() + 6) % 7);
+            const week1 = new Date(date.getFullYear(), 0, 4);
+            return (1 + Math.round(((date.getTime() - week1.getTime()) / 86400000 - 3 + (week1.getDay() + 6) % 7) / 7)) % 2 === 0 ? 'B' : 'A';
         }
 
         function save() { localStorage.setItem(storageKey, JSON.stringify(db)); render(); }
-        function openOverlay(id) { document.getElementById('over-' + id).style.display = 'block'; render(); }
-        function closeOverlay(id) { document.getElementById('over-' + id).style.display = 'none'; }
+        function openOverlay(id) { document.getElementById('over-'+id).style.display='block'; render(); }
+        function closeOverlay(id) { document.getElementById('over-'+id).style.display='none'; }
 
-        window.addEventListener('load', () => {
-            setTimeout(() => document.getElementById('splash-screen').classList.add('hidden'), 2000);
-            initDB();
-            render();
-        });
-
-        function addSubject() { db.subjects.push({name: "NOUVELLE", tools: ""}); save(); }
-        
+        function addSubject() { db.subjects.push({name:"NOUVEAU", tools:""}); save(); }
         function addReminder() {
-            const txt = document.getElementById('rem-text').value;
-            const dt = document.getElementById('rem-date').value;
-            if(txt && dt) { 
-                db.reminders.push({text: txt, date: dt}); 
-                document.getElementById('rem-text').value = "";
-                save(); 
-            }
+            const t = document.getElementById('rem-text').value;
+            const d = document.getElementById('rem-date').value;
+            if(t && d) { db.reminders.push({text:t, date:d}); document.getElementById('rem-text').value=""; save(); }
+        }
+
+        function updateSlot(day, idx, val, isB = false) {
+            let current = db.schedule[day].slots[idx] || "";
+            let [a, b] = current.includes('|') ? current.split('|').map(s=>s.trim()) : [current, current];
+            if(isB) b = val; else a = val;
+            db.schedule[day].slots[idx] = (a === b && !isB) ? a : `${a}|${b}`;
+            save();
+        }
+
+        function deleteSB(day, idx) {
+            let current = db.schedule[day].slots[idx] || "";
+            if(current.includes('|')) db.schedule[day].slots[idx] = current.split('|')[0].trim();
+            save();
         }
 
         function render() {
             const now = new Date();
-            const tomorrow = new Date(now);
-            tomorrow.setDate(now.getDate() + 1);
-            
-            // Format Date ISO local (YYYY-MM-DD) sans décalage
-            const tISO = tomorrow.toLocaleDateString('en-CA'); 
-            const tDayName = ["Dimanche", "Lundi", "Mardi", "Mercredi", "Jeudi", "Vendredi", "Samedi"][tomorrow.getDay()];
-            
+            const tomorrow = new Date(now); tomorrow.setDate(tomorrow.getDate() + 1);
+            const tDay = ["Dimanche","Lundi","Mardi","Mercredi","Jeudi","Vendredi","Samedi"][tomorrow.getDay()];
+            const sCur = getWeek(now);
+            const sTom = getWeek(tomorrow);
+
+            document.getElementById('week-indicator').innerText = "SÉQUENCE : SEMAINE " + sCur;
+            document.getElementById('plan-week-info').innerText = "AFFICHAGE : SEMAINE " + sCur;
             document.getElementById('tomorrow-title').innerText = tomorrow.toLocaleDateString('fr-FR', {weekday:'long', day:'numeric', month:'long'});
 
-            // 1. Rappels
+            // 1. Alarme / Rappels
             const remZone = document.getElementById('active-reminders');
-            const activeRems = db.reminders.filter(r => r.date === tISO);
-            remZone.innerHTML = activeRems.map(r => `<div class="reminder-main">⚠️ <b>À NE PAS OUBLIER :</b><br>${r.text}</div>`).join('');
+            const tISO = tomorrow.toLocaleDateString('en-CA');
+            remZone.innerHTML = db.reminders.filter(r => r.date === tISO).map(r => `<div class="reminder-main">⚠️ <b>À NE PAS OUBLIER :</b><br>${r.text}</div>`).join('');
 
-            // 2. Liste de demain
-            const mainList = document.getElementById('main-list');
-            mainList.innerHTML = "";
-            const dayData = db.schedule[tDayName];
-            if(dayData && dayData.active) {
-                dayData.slots.forEach((subName, i) => {
-                    if(subName) {
-                        const sub = db.subjects.find(s => s.name === subName);
-                        const tools = sub ? sub.tools.split(',').map(t => `<span class="tag">${t.trim()}</span>`).join('') : '';
-                        mainList.innerHTML += `
-                            <div class="course-item">
-                                <div class="time-col">${DEFAULT_SLOTS[i].replace(' - ','<br>')}</div>
-                                <div><strong>${subName}</strong><div style="margin-top:5px">${tools}</div></div>
-                            </div>`;
-                    }
+            // 2. Liste principale (Demain) avec CSS badges
+            const main = document.getElementById('main-list');
+            main.innerHTML = "";
+            if(db.schedule[tDay]?.active) {
+                db.schedule[tDay].slots.forEach((s, i) => {
+                    if(!s) return;
+                    let name = s.includes('|') ? (sTom === 'A' ? s.split('|')[0] : s.split('|')[1]) : s;
+                    if(!name) return;
+                    const sub = db.subjects.find(m => m.name === name.trim());
+                    const tags = sub && sub.tools ? sub.tools.split(',').map(t => `<span class="tag">${t.trim()}</span>`).join('') : '';
+                    main.innerHTML += `<div class="course-item"><div class="time-col">${SLOTS[i]}</div><div><b>${name}</b><br>${tags}</div></div>`;
                 });
             }
-            if(!mainList.innerHTML) mainList.innerHTML = "<p>Rien à préparer ! 🏖️</p>";
+            if(!main.innerHTML) main.innerHTML = "<p>Rien à préparer ! 🏖️</p>";
 
-            // 3. Config Matières
-            document.getElementById('sub-config-list').innerHTML = db.subjects.map((s, i) => `
+            // 3. Grille de saisie
+            let gridHTML = `<div class="sch-times-sidebar">${SLOTS.map(t => `<div style="height:105px; font-size:0.7rem; color:gray; font-weight:bold">${t}</div>`).join('')}</div>`;
+            ["Lundi", "Mardi", "Mercredi", "Jeudi", "Vendredi", "Samedi"].forEach(day => {
+                const dayObj = db.schedule[day];
+                while(dayObj.slots.length < SLOTS.length) dayObj.slots.push("");
+                gridHTML += `<div class="sch-day-column">
+                    <div style="text-align:center; font-weight:800; margin-bottom:10px">
+                        <input type="checkbox" ${dayObj.active?'checked':''} onchange="db.schedule['${day}'].active=this.checked; save()"> ${day.slice(0,3)}
+                    </div>
+                    ${dayObj.slots.map((val, i) => {
+                        const [a, b] = val.includes('|') ? val.split('|').map(s=>s.trim()) : [val, val];
+                        const hasB = val.includes('|');
+                        return `<div class="slot-box">
+                            <select onchange="updateSlot('${day}',${i},this.value)">
+                                <option value="">--</option>
+                                ${db.subjects.map(m => `<option value="${m.name}" ${m.name==a?'selected':''}>${m.name}</option>`).join('')}
+                            </select>
+                            ${hasB ? `<div style="display:flex; justify-content:space-between; align-items:center"><span class="tag-sb">S-B</span><button class="btn-del-sb" onclick="deleteSB('${day}',${i})">🗑️</button></div>
+                            <select onchange="updateSlot('${day}',${i},this.value, true)">
+                                ${db.subjects.map(m => `<option value="${m.name}" ${m.name==b?'selected':''}>${m.name}</option>`).join('')}
+                            </select>` : `<button class="btn-plus" onclick="updateSlot('${day}',${i},'${a}',true)">+ Semaine B</button>`}
+                        </div>`;
+                    }).join('')}
+                </div>`;
+            });
+            document.getElementById('sch-grid').innerHTML = gridHTML;
+
+            // 4. Liste Matières
+            document.getElementById('sub-list').innerHTML = db.subjects.map((s,i) => `
                 <div style="display:flex; gap:5px; margin-bottom:10px">
-                    <input type="text" value="${s.name}" onchange="db.subjects[${i}].name=this.value.toUpperCase(); save()">
-                    <input type="text" value="${s.tools}" onchange="db.subjects[${i}].tools=this.value; save()" placeholder="Matériel">
+                    <input style="flex:1; padding:8px; border-radius:8px; border:1px solid #ddd" value="${s.name}" onchange="db.subjects[${i}].name=this.value.toUpperCase(); save()">
+                    <input style="flex:1; padding:8px; border-radius:8px; border:1px solid #ddd" value="${s.tools}" placeholder="Cahier, livre..." onchange="db.subjects[${i}].tools=this.value; save()">
                     <button class="btn" style="background:#fee2e2" onclick="db.subjects.splice(${i},1); save()">🗑️</button>
                 </div>`).join('');
 
-            // 4. Config Planning
-            let schHTML = "";
-            ["Lundi", "Mardi", "Mercredi", "Jeudi", "Vendredi", "Samedi"].forEach(day => {
-                const dayObj = db.schedule[day];
-                let slotsHTML = dayObj.slots.map((val, i) => `
-                    <div style="display:flex; align-items:center; gap:10px; margin-bottom:5px">
-                        <small style="width:100px; font-size:0.7rem">${DEFAULT_SLOTS[i]}</small>
-                        <select onchange="db.schedule['${day}'].slots[${i}]=this.value; save()">
-                            <option value="">-- VIDE --</option>
-                            ${db.subjects.map(s => `<option value="${s.name}" ${s.name==val?'selected':''}>${s.name}</option>`).join('')}
-                        </select>
-                    </div>`).join('');
-                schHTML += `<div style="margin-bottom:20px; border-bottom:1px solid #eee; padding-bottom:10px">
-                    <div style="display:flex; gap:10px; margin-bottom:10px">
-                        <input type="checkbox" style="width:20px" ${dayObj.active?'checked':''} onchange="db.schedule['${day}'].active=this.checked; save()">
-                        <label style="font-weight:800">${day}</label>
-                    </div>${slotsHTML}</div>`;
-            });
-            document.getElementById('sch-config-list').innerHTML = schHTML;
-
-            // 5. Liste des rappels (Gestion)
-            document.getElementById('rem-config-list').innerHTML = db.reminders.map((r, i) => `
+            // 5. Liste Rappels Config
+            document.getElementById('rem-list-config').innerHTML = db.reminders.map((r,i) => `
                 <div class="course-item">
                     <div style="flex:1"><b>${r.date.split('-').reverse().join('/')}</b><br>${r.text}</div>
                     <button class="btn" style="background:#fee2e2" onclick="db.reminders.splice(${i},1); save()">🗑️</button>
                 </div>`).join('');
-
-            // 6. Vue Semaine
-            document.getElementById('week-display').innerHTML = ["Lundi", "Mardi", "Mercredi", "Jeudi", "Vendredi", "Samedi"].map(d => `
+            
+            // 6. Vue Planning
+            document.getElementById('week-display').innerHTML = ["Lundi", "Mardi", "Mercredi", "Jeudi", "Vendredi", "Samedi"].map(day => `
                 <div class="week-card">
-                    <h4>${d}</h4>
-                    ${db.schedule[d].active ? db.schedule[d].slots.map((s,i) => s ? `<div class="slot-mini"><b>${DEFAULT_SLOTS[i].split(' ')[0]}</b> ${s}</div>` : '').join('') : '<center>---</center>'}
+                    <h4 style="margin:0; color:var(--primary); font-size:0.9rem">${day}</h4>
+                    ${db.schedule[day].active ? db.schedule[day].slots.map((s,i) => {
+                        if(!s) return '';
+                        let name = s.includes('|') ? (sCur === 'A' ? s.split('|')[0] : s.split('|')[1]) : s;
+                        return name ? `<div class="slot-mini"><b>${SLOTS[i]}</b> <span>${name}</span></div>` : '';
+                    }).join('') : '<center style="color:#ccc; font-size:0.7rem; margin-top:10px">Repos</center>'}
                 </div>`).join('');
         }
+
+        render();
     </script>
 </body>
 </html>
-
-
-
