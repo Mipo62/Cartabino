@@ -24,7 +24,7 @@
         .container { max-width: 500px; margin: 20px auto; padding: 0 20px 40px 20px; }
         @media (orientation: landscape) { .container { max-width: 950px; } }
 
-        /* STYLE ALARME / RAPPEL JAUNE */
+        /* RAPPEL STYLE POST-IT */
         .reminder-main {
             background: linear-gradient(135deg, #fff9c4 0%, #ffecb3 100%);
             border: 1px solid #ffe082; padding: 18px; border-radius: 20px;
@@ -51,7 +51,8 @@
         
         select { font-size: 0.8rem; padding: 5px; border-radius: 8px; border: 1px solid #ddd; width: 100%; background: #fff; }
         .btn { border: none; padding: 10px 15px; border-radius: 12px; font-weight: 600; cursor: pointer; }
-        .btn-plus { background: var(--primary); color: white; border: none; border-radius: 5px; font-size: 0.65rem; padding: 3px 8px; cursor: pointer; align-self: flex-start; }
+        .btn-plus { background: none; color: var(--primary); border: 1px dashed var(--primary); border-radius: 6px; font-size: 0.65rem; padding: 2px 6px; cursor: pointer; align-self: flex-start; margin-top: 2px; opacity: 0.6; }
+        .btn-plus:hover { opacity: 1; background: #f5f7ff; }
         .btn-del-sb { background: #fee2e2; color: #ef4444; border: none; border-radius: 5px; font-size: 0.6rem; padding: 2px 5px; cursor: pointer; }
         .tag-sb { font-size: 0.55rem; font-weight: 800; color: var(--secondary); text-transform: uppercase; }
 
@@ -90,30 +91,27 @@
 
     <div id="over-reminders" class="overlay">
         <div style="display:flex; justify-content:space-between; margin-bottom:20px; align-items: center;">
-            <h2>🔔 Rappels</h2><button class="btn" onclick="closeOverlay('reminders')">Fermer</button>
+            <h2>🔔 Mes Rappels</h2><button class="btn" onclick="closeOverlay('reminders')">Fermer</button>
         </div>
         <div class="config-section">
-            <input type="text" id="rem-text" placeholder="Ex: Prendre le sac de sport" style="width:100%; padding:10px; border-radius:10px; border:1px solid #ddd; margin-bottom:10px">
+            <input type="text" id="rem-text" placeholder="Prendre quoi ?" style="width:100%; padding:10px; border-radius:10px; border:1px solid #ddd; margin-bottom:10px">
             <input type="date" id="rem-date" style="width:100%; padding:10px; border-radius:10px; border:1px solid #ddd; margin-bottom:10px">
-            <button class="btn" onclick="addReminder()" style="width:100%; background:var(--primary); color:white">Ajouter</button>
+            <button class="btn" onclick="addReminder()" style="width:100%; background:var(--primary); color:white">Ajouter ce rappel</button>
         </div>
-        <div id="rem-list-config"></div>
+        <div id="rem-list-display"></div>
     </div>
 
     <div id="over-settings" class="overlay">
         <div style="display:flex; justify-content:space-between; margin-bottom:20px; align-items: center;">
             <h2>Réglages</h2><button class="btn" onclick="closeOverlay('settings')">Fermer</button>
         </div>
-        
         <div class="config-section">
             <h3>Matières & Matériel</h3>
             <div id="sub-list"></div>
             <button class="btn" onclick="addSubject()" style="width:100%; margin-top:10px; background:#e0e7ff; color:var(--primary)">+ Ajouter une matière</button>
         </div>
-
         <div class="config-section">
             <h3>Emploi du Temps</h3>
-            <p style="font-size:0.75rem; color:gray; margin-bottom:15px">Glisse vers la droite →. Pour supprimer une semaine B, clique sur la poubelle rouge.</p>
             <div class="sch-scroll" id="sch-grid"></div>
         </div>
     </div>
@@ -132,7 +130,8 @@
             const date = new Date(d.getTime());
             date.setDate(date.getDate() + 3 - (date.getDay() + 6) % 7);
             const week1 = new Date(date.getFullYear(), 0, 4);
-            return (1 + Math.round(((date.getTime() - week1.getTime()) / 86400000 - 3 + (week1.getDay() + 6) % 7) / 7)) % 2 === 0 ? 'B' : 'A';
+            const n = 1 + Math.round(((date.getTime() - week1.getTime()) / 86400000 - 3 + (week1.getDay() + 6) % 7) / 7);
+            return (n % 2 === 0) ? 'B' : 'A';
         }
 
         function save() { localStorage.setItem(storageKey, JSON.stringify(db)); render(); }
@@ -141,8 +140,7 @@
 
         function addSubject() { db.subjects.push({name:"NOUVEAU", tools:""}); save(); }
         function addReminder() {
-            const t = document.getElementById('rem-text').value;
-            const d = document.getElementById('rem-date').value;
+            const t = document.getElementById('rem-text').value, d = document.getElementById('rem-date').value;
             if(t && d) { db.reminders.push({text:t, date:d}); document.getElementById('rem-text').value=""; save(); }
         }
 
@@ -164,26 +162,23 @@
             const now = new Date();
             const tomorrow = new Date(now); tomorrow.setDate(tomorrow.getDate() + 1);
             const tDay = ["Dimanche","Lundi","Mardi","Mercredi","Jeudi","Vendredi","Samedi"][tomorrow.getDay()];
-            const sCur = getWeek(now);
-            const sTom = getWeek(tomorrow);
+            const sCur = getWeek(now), sTom = getWeek(tomorrow);
 
             document.getElementById('week-indicator').innerText = "SÉQUENCE : SEMAINE " + sCur;
             document.getElementById('plan-week-info').innerText = "AFFICHAGE : SEMAINE " + sCur;
             document.getElementById('tomorrow-title').innerText = tomorrow.toLocaleDateString('fr-FR', {weekday:'long', day:'numeric', month:'long'});
 
-            // 1. Alarme / Rappels
-            const remZone = document.getElementById('active-reminders');
+            // 1. Rappels actifs
             const tISO = tomorrow.toLocaleDateString('en-CA');
-            remZone.innerHTML = db.reminders.filter(r => r.date === tISO).map(r => `<div class="reminder-main">⚠️ <b>À NE PAS OUBLIER :</b><br>${r.text}</div>`).join('');
+            document.getElementById('active-reminders').innerHTML = db.reminders.filter(r => r.date === tISO).map(r => `<div class="reminder-main">⚠️ <b>À NE PAS OUBLIER :</b><br>${r.text}</div>`).join('');
 
-            // 2. Liste principale (Demain) avec CSS badges
+            // 2. Main List
             const main = document.getElementById('main-list');
             main.innerHTML = "";
             if(db.schedule[tDay]?.active) {
                 db.schedule[tDay].slots.forEach((s, i) => {
                     if(!s) return;
                     let name = s.includes('|') ? (sTom === 'A' ? s.split('|')[0] : s.split('|')[1]) : s;
-                    if(!name) return;
                     const sub = db.subjects.find(m => m.name === name.trim());
                     const tags = sub && sub.tools ? sub.tools.split(',').map(t => `<span class="tag">${t.trim()}</span>`).join('') : '';
                     main.innerHTML += `<div class="course-item"><div class="time-col">${SLOTS[i]}</div><div><b>${name}</b><br>${tags}</div></div>`;
@@ -191,60 +186,32 @@
             }
             if(!main.innerHTML) main.innerHTML = "<p>Rien à préparer ! 🏖️</p>";
 
-            // 3. Grille de saisie
+            // 3. Grille Saisie
             let gridHTML = `<div class="sch-times-sidebar">${SLOTS.map(t => `<div style="height:105px; font-size:0.7rem; color:gray; font-weight:bold">${t}</div>`).join('')}</div>`;
             ["Lundi", "Mardi", "Mercredi", "Jeudi", "Vendredi", "Samedi"].forEach(day => {
                 const dayObj = db.schedule[day];
                 while(dayObj.slots.length < SLOTS.length) dayObj.slots.push("");
-                gridHTML += `<div class="sch-day-column">
-                    <div style="text-align:center; font-weight:800; margin-bottom:10px">
-                        <input type="checkbox" ${dayObj.active?'checked':''} onchange="db.schedule['${day}'].active=this.checked; save()"> ${day.slice(0,3)}
-                    </div>
-                    ${dayObj.slots.map((val, i) => {
-                        const [a, b] = val.includes('|') ? val.split('|').map(s=>s.trim()) : [val, val];
-                        const hasB = val.includes('|');
-                        return `<div class="slot-box">
-                            <select onchange="updateSlot('${day}',${i},this.value)">
-                                <option value="">--</option>
-                                ${db.subjects.map(m => `<option value="${m.name}" ${m.name==a?'selected':''}>${m.name}</option>`).join('')}
-                            </select>
-                            ${hasB ? `<div style="display:flex; justify-content:space-between; align-items:center"><span class="tag-sb">S-B</span><button class="btn-del-sb" onclick="deleteSB('${day}',${i})">🗑️</button></div>
-                            <select onchange="updateSlot('${day}',${i},this.value, true)">
-                                ${db.subjects.map(m => `<option value="${m.name}" ${m.name==b?'selected':''}>${m.name}</option>`).join('')}
-                            </select>` : `<button class="btn-plus" onclick="updateSlot('${day}',${i},'${a}',true)">+ Semaine B</button>`}
-                        </div>`;
-                    }).join('')}
-                </div>`;
+                gridHTML += `<div class="sch-day-column"><div style="text-align:center; font-weight:800; margin-bottom:10px"><input type="checkbox" ${dayObj.active?'checked':''} onchange="db.schedule['${day}'].active=this.checked; save()"> ${day.slice(0,3)}</div>${dayObj.slots.map((val, i) => {
+                    const [a, b] = val.includes('|') ? val.split('|').map(s=>s.trim()) : [val, val];
+                    const hasB = val.includes('|');
+                    return `<div class="slot-box"><select onchange="updateSlot('${day}',${i},this.value)"><option value="">--</option>${db.subjects.map(m => `<option value="${m.name}" ${m.name==a?'selected':''}>${m.name}</option>`).join('')}</select>${hasB ? `<div style="display:flex; justify-content:space-between; align-items:center"><span class="tag-sb">S-B</span><button class="btn-del-sb" onclick="deleteSB('${day}',${i})">🗑️</button></div><select onchange="updateSlot('${day}',${i},this.value, true)">${db.subjects.map(m => `<option value="${m.name}" ${m.name==b?'selected':''}>${m.name}</option>`).join('')}</select>` : `<button class="btn-plus" onclick="updateSlot('${day}',${i},'${a}',true)">+S-B</button>`}</div>`;
+                }).join('')}</div>`;
             });
             document.getElementById('sch-grid').innerHTML = gridHTML;
 
-            // 4. Liste Matières
-            document.getElementById('sub-list').innerHTML = db.subjects.map((s,i) => `
-                <div style="display:flex; gap:5px; margin-bottom:10px">
-                    <input style="flex:1; padding:8px; border-radius:8px; border:1px solid #ddd" value="${s.name}" onchange="db.subjects[${i}].name=this.value.toUpperCase(); save()">
-                    <input style="flex:1; padding:8px; border-radius:8px; border:1px solid #ddd" value="${s.tools}" placeholder="Cahier, livre..." onchange="db.subjects[${i}].tools=this.value; save()">
-                    <button class="btn" style="background:#fee2e2" onclick="db.subjects.splice(${i},1); save()">🗑️</button>
-                </div>`).join('');
+            // 4. Matières Config
+            document.getElementById('sub-list').innerHTML = db.subjects.map((s,i) => `<div style="display:flex; gap:5px; margin-bottom:10px"><input style="flex:1; padding:8px; border-radius:8px; border:1px solid #ddd" value="${s.name}" onchange="db.subjects[${i}].name=this.value.toUpperCase(); save()"><input style="flex:1; padding:8px; border-radius:8px; border:1px solid #ddd" value="${s.tools}" onchange="db.subjects[${i}].tools=this.value; save()"><button class="btn" style="background:#fee2e2" onclick="db.subjects.splice(${i},1); save()">🗑️</button></div>`).join('');
 
-            // 5. Liste Rappels Config
-            document.getElementById('rem-list-config').innerHTML = db.reminders.map((r,i) => `
-                <div class="course-item">
-                    <div style="flex:1"><b>${r.date.split('-').reverse().join('/')}</b><br>${r.text}</div>
-                    <button class="btn" style="background:#fee2e2" onclick="db.reminders.splice(${i},1); save()">🗑️</button>
-                </div>`).join('');
+            // 5. Liste Rappels
+            document.getElementById('rem-list-display').innerHTML = db.reminders.map((r,i) => `<div class="course-item"><div style="flex:1"><b>${r.date.split('-').reverse().join('/')}</b><br>${r.text}</div><button class="btn" style="background:#fee2e2" onclick="db.reminders.splice(${i},1); save()">🗑️</button></div>`).join('');
             
-            // 6. Vue Planning
-            document.getElementById('week-display').innerHTML = ["Lundi", "Mardi", "Mercredi", "Jeudi", "Vendredi", "Samedi"].map(day => `
-                <div class="week-card">
-                    <h4 style="margin:0; color:var(--primary); font-size:0.9rem">${day}</h4>
-                    ${db.schedule[day].active ? db.schedule[day].slots.map((s,i) => {
-                        if(!s) return '';
-                        let name = s.includes('|') ? (sCur === 'A' ? s.split('|')[0] : s.split('|')[1]) : s;
-                        return name ? `<div class="slot-mini"><b>${SLOTS[i]}</b> <span>${name}</span></div>` : '';
-                    }).join('') : '<center style="color:#ccc; font-size:0.7rem; margin-top:10px">Repos</center>'}
-                </div>`).join('');
+            // 6. Planning
+            document.getElementById('week-display').innerHTML = ["Lundi", "Mardi", "Mercredi", "Jeudi", "Vendredi", "Samedi"].map(day => `<div class="week-card"><h4 style="margin:0; color:var(--primary); font-size:0.9rem">${day}</h4>${db.schedule[day].active ? db.schedule[day].slots.map((s,i) => {
+                if(!s) return '';
+                let name = s.includes('|') ? (sCur === 'A' ? s.split('|')[0] : s.split('|')[1]) : s;
+                return `<div class="slot-mini"><b>${SLOTS[i]}</b> <span>${name}</span></div>`;
+            }).join('') : '<center style="color:#ccc; font-size:0.7rem; margin-top:10px">Repos</center>'}</div>`).join('');
         }
-
         render();
     </script>
 </body>
